@@ -10,37 +10,61 @@ final List<String> imgList = [
   'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
 ];
 
-class SliderScreen extends StatelessWidget {
+class SliderScreen extends StatefulWidget {
   const SliderScreen({Key? key}) : super(key: key);
 
+  @override
+  State<SliderScreen> createState() => _SliderScreenState();
+}
+
+class _SliderScreenState extends State<SliderScreen> {
+  CarouselController _controller = CarouselController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Slider Screen'),
       ),
-      body: Builder(
-        builder: (context) {
-          final double height = MediaQuery.of(context).size.height;
-          return CarouselSlider(
-            options: CarouselOptions(
-              height: height,
-              viewportFraction: 1,
-              enlargeCenterPage: false,
-              autoPlay: true,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Builder(
+              builder: (context) {
+                final double height = MediaQuery.of(context).size.height;
+                return CarouselSlider(
+                  carouselController: _controller,
+                  options: CarouselOptions(
+                    height: height,
+                    viewportFraction: 1.0,
+                    enlargeCenterPage: false,
+                    // autoPlay: true,
+                  ),
+                  items: imgList
+                      .map((item) => Container(
+                            child: Center(
+                                child: Image.network(
+                              item,
+                              fit: BoxFit.cover,
+                              height: height,
+                            )),
+                          ))
+                      .toList(),
+                );
+              },
             ),
-            items: imgList
-                .map((item) => Container(
-                      child: Center(
-                          child: Image.network(
-                        item,
-                        fit: BoxFit.cover,
-                        height: height,
-                      )),
-                    ))
-                .toList(),
-          );
-        },
+            Row(
+              children: [
+                ElevatedButton(
+                    onPressed: () => _controller.previousPage(),
+                    child: Center(child: Text('back'))),
+                ElevatedButton(
+                  onPressed: () => _controller.nextPage(),
+                  child: Text('Next'),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
