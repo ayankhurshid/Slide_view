@@ -10,62 +10,76 @@ final List<String> imgList = [
   'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
 ];
 
-class SliderScreen extends StatefulWidget {
-  const SliderScreen({Key? key}) : super(key: key);
-
+class CarouselWithIndicatorDemo extends StatefulWidget {
   @override
-  State<SliderScreen> createState() => _SliderScreenState();
+  State<StatefulWidget> createState() {
+    return _CarouselWithIndicatorState();
+  }
 }
 
-class _SliderScreenState extends State<SliderScreen> {
-  CarouselController _controller = CarouselController();
+class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
+  int _current = 0;
+  final CarouselController _controller = CarouselController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Slider Screen'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Builder(
-              builder: (context) {
-                final double height = MediaQuery.of(context).size.height;
-                return CarouselSlider(
-                  carouselController: _controller,
-                  options: CarouselOptions(
-                    height: height,
-                    viewportFraction: 1.0,
-                    enlargeCenterPage: false,
-                    // autoPlay: true,
-                  ),
-                  items: imgList
-                      .map((item) => Container(
-                            child: Center(
-                                child: Image.network(
-                              item,
-                              fit: BoxFit.cover,
-                              height: height,
-                            )),
-                          ))
-                      .toList(),
-                );
-              },
-            ),
-            Row(
-              children: [
-                ElevatedButton(
-                    onPressed: () => _controller.previousPage(),
-                    child: Center(child: Text('back'))),
-                ElevatedButton(
-                  onPressed: () => _controller.nextPage(),
-                  child: Text('Next'),
-                ),
-              ],
-            )
-          ],
+      appBar: AppBar(title: Text('DEMO')),
+      body: Column(children: [
+        Expanded(
+          child: CarouselSlider(
+            items: imgList
+                .map((item) => Container(
+                      child: Center(
+                          child: Image.network(
+                        item,
+                        fit: BoxFit.cover,
+                        height: double.infinity,
+                      )),
+                    ))
+                .toList(),
+            options: CarouselOptions(
+                // autoPlay: true,
+                enlargeCenterPage: true,
+                aspectRatio: 2.0,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    _current = index;
+                  });
+                }),
+          ),
         ),
-      ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: imgList.asMap().entries.map((entry) {
+            return GestureDetector(
+              onTap: () => _controller.animateToPage(entry.key),
+              child: Container(
+                width: 12.0,
+                height: 12.0,
+                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.blue)
+                        .withOpacity(_current == entry.key ? 0.9 : 0.4)),
+              ),
+            );
+          }).toList(),
+        ),
+        // Row(
+        //   children: [
+        //     ElevatedButton(
+        //         onPressed: () => _controller.previousPage(),
+        //         child: Center(child: Text('back'))),
+        //     ElevatedButton(
+        //       onPressed: () => _controller.nextPage(),
+        //       child: Text('Next'),
+        //     ),
+        //   ],
+        // )
+      ]),
     );
   }
 }
