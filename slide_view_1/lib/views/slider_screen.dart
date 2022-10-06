@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 final List<String> imgList = [
   'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',
@@ -10,15 +12,8 @@ final List<String> imgList = [
   'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
 ];
 
-class CarouselWithIndicatorDemo extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _CarouselWithIndicatorState();
-  }
-}
-
-class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
-  int _current = 0;
+class CarouselWithIndicatorDemo extends StatelessWidget {
+  var _current = 0.obs;
   final CarouselController _controller = CarouselController();
 
   @override
@@ -43,9 +38,7 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
                 enlargeCenterPage: true,
                 aspectRatio: 2.0,
                 onPageChanged: (index, reason) {
-                  setState(() {
-                    _current = index;
-                  });
+                  _current.value = index;
                 }),
           ),
         ),
@@ -53,19 +46,22 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: imgList.asMap().entries.map((entry) {
             return GestureDetector(
-              onTap: () => _controller.animateToPage(entry.key),
-              child: Container(
-                width: 12.0,
-                height: 12.0,
-                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: (Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.blue)
-                        .withOpacity(_current == entry.key ? 0.9 : 0.4)),
-              ),
-            );
+                onTap: () => _controller.animateToPage(entry.key),
+                child: Obx(
+                  () => (Container(
+                    width: 12.0,
+                    height: 12.0,
+                    margin:
+                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.blue)
+                            .withOpacity(
+                                _current.value == entry.key ? 0.9 : 0.4)),
+                  )),
+                ));
           }).toList(),
         ),
         // Row(
